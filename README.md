@@ -7,8 +7,8 @@ A clean, responsive single-page website for a modern cafe. Built to showcase men
 - Single-File Architecture: Optimized for fast loading by including HTML, CSS, and JS in one file.
 
 ## 🛠️ Tech Stack
-HTML5: Semantic structure.
-CSS3: Custom styling and animations.
+HTML5: Semantic structure.<br>
+CSS3: Custom styling and animations.<br>
 JavaScript: Dynamic interactions.
 
 ## 📸 Screenshots
