@@ -11,8 +11,9 @@ HTML5: Semantic structure.
 CSS3: Custom styling and animations.
 JavaScript: Dynamic interactions.
 
-📸 Screenshots
-"C:\gesture controlled ppt\cafe\Screenshot.png"
+## 📸 Screenshots
+<img width="992" height="503" alt="Screenshot" src="https://github.com/user-attachments/assets/c5ae8c74-bb95-45d0-9257-68ef5e921cc6" />
 
-✍️ Author
+## ✍️ Author
 Sampatti Borse
+
