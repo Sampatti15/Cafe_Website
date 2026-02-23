@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Café Aroma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0f1015;
+      --bg-soft: #171821;
+      --accent: #e5a86b;
+      --accent-soft: rgba(229, 168, 107, 0.15);
+      --text: #f5f5f5;
+      --muted: #a5a9b8;
+      --card: #1d1f2b;
+      --danger: #e96b6b;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.4);
+      --transition-fast: 180ms ease-out;
+      --transition-med: 260ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #23263b 0, #090a10 48%, #05050a 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #44486a, #2e324b);
+      border-radius: 999px;
+    }
+
+    .noise-overlay {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 26px 18px 80px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 40% 60% 60% 40%;
+      background: radial-gradient(circle at 20% 20%, #ffefcf 0, #e39b53 36%, #4d2810 74%);
+      box-shadow:
+        0 0 0 2px rgba(0, 0, 0, 0.5),
+        0 18px 35px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(229, 168, 107, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-logo::after {
+      content: "";
+      position: absolute;
+      inset: 8px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.4);
+      opacity: 0.7;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .brand-text h1 {
+      font-size: 1.08rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .brand-text span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-pill {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.6));
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-pill span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #ffb969, #9e4a18);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-pill:hover {
+      transform: translateY(-1px);
+      border-color: rgba(229, 168, 107, 0.7);
+      color: #ffdcb3;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+      background: linear-gradient(to bottom right, rgba(229, 168, 107, 0.15), rgba(5, 5, 10, 0.9));
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 36px;
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .hero-copy {
+      position: relative;
+      padding: 18px 18px 18px 0;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 4px 11px 4px 4px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+      margin-bottom: 14px;
+      backdrop-filter: blur(14px);
+    }
+
+    .badge-cup {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: conic-gradient(from 180deg, #fcebc5, #f8b76b, #9c5827, #fcebc5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2c170a;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .badge-cup::after {
+      content: "";
+      position: absolute;
+      inset: 6px 7px 5px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, #f8f1df, #f0c079);
+      opacity: 0.8;
+    }
+
+    .badge-cup span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge span {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 3.5vw, 3rem);
+      line-height: 1.05;
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-title span.accent {
+      background: linear-gradient(to right, #ffd39a, #f0a15a);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      font-size: 0.94rem;
+      max-width: 460px;
+      margin-bottom: 18px;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 0.86rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at 0 0, #fff1ce 0, #f0a35f 40%, #7e3c17 100%);
+      color: #2b1608;
+      box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(0, 0, 0, 0.6);
+      font-weight: 600;
+    }
+
+    .btn-primary span.icon {
+      font-size: 1rem;
+      transform: translateY(1px);
+      transition: transform var(--transition-fast);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px) translateZ(0);
+      box-shadow:
+        0 22px 48px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(0, 0, 0, 0.7);
+      background-position: 0 8px;
+    }
+
+    .btn-primary:hover span.icon {
+      transform: translate(2px, 1px);
+    }
+
+    .btn-ghost {
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .btn-ghost:hover {
+      transform: translateY(-1px);
+      color: #f8e3c0;
+      border-color: rgba(229, 168, 107, 0.8);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.6);
+      background: rgba(12, 8, 4, 0.9);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .hero-meta strong {
+      color: #f8e3c0;
+      font-weight: 500;
+    }
+
+    /* Hero visual */
+    .hero-visual {
+      position: relative;
+      padding: 10px;
+      isolation: isolate;
+    }
+
+    .hero-orbit {
+      position: relative;
+      border-radius: 24px;
+      background: radial-gradient(circle at 40% 0, rgba(255, 214, 153, 0.3) 0, rgba(0, 0, 0, 0.94) 52%, #030308 100%);
+      box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 0 0 1px rgba(0, 0, 0, 0.6) inset;
+      padding: 20px 18px 18px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-orbit::before {
+      content: "";
+      position: absolute;
+      inset: 20% -10%;
+      border-radius: 50%;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.02);
+      border-left: none;
+      border-right: none;
+      opacity: 0.8;
+      transform: rotate(-7deg);
+    }
+
+    .hero-orbit::after {
+      content: "";
+      position: absolute;
+      inset: 46% -16%;
+      border-radius: 50%;
+      border-top: 1px dashed rgba(229, 168, 107, 0.55);
+      border-bottom: none;
+      border-left: none;
+      border-right: none;
+      opacity: 0.7;
+      transform: rotate(8deg);
+      filter: blur(0.1px);
+    }
+
+    .hero-cup {
+      position: relative;
+      margin: 18px auto 8px;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      animation: floatCup 4.6s ease-in-out infinite;
+    }
+
+    @keyframes floatCup {
+      0%, 100% {
+        transform: translateY(0px) translateZ(0);
+      }
+      50% {
+        transform: translateY(-8px) translateZ(0);
+      }
+    }
+
+    .cup-body {
+      width: 110px;
+      height: 120px;
+      border-radius: 52% 52% 36% 36%;
+      background: radial-gradient(circle at 30% 0, #ffffff 0, #f3d79d 26%, #f2b166 60%, #d57c36 100%);
+      position: relative;
+      box-shadow:
+        0 18px 30px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .cup-body::before {
+      content: "";
+      position: absolute;
+      inset: 12px 8px auto;
+      height: 28px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 0, #6f3a17 0, #2c1407 60%);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .cup-body::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), transparent 40%);
+      opacity: 0.8;
+    }
+
+    .cup-handle {
+      position: absolute;
+      width: 50px;
+      height: 64px;
+      border-radius: 50%;
+      border: 8px solid #f6c47e;
+      border-left-color: transparent;
+      border-bottom-color: transparent;
+      right: -30px;
+      top: 30px;
+      transform: rotate(18deg);
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.7));
+    }
+
+    .cup-plate {
+      position: absolute;
+      width: 150px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 0, #fbe3b2 0, #e4b370 40%, #7d3c18 100%);
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow:
+        0 22px 26px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(0, 0, 0, 0.7);
+    }
+
+    .steam {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .steam span {
+      width: 4px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(to top, transparent, rgba(255, 255, 255, 0.8));
+      opacity: 0;
+      filter: blur(1px);
+      animation: steamRise 2.6s ease-out infinite;
+    }
+
+    .steam span:nth-child(2) {
+      height: 32px;
+      animation-delay: 0.35s;
+    }
+
+    .steam span:nth-child(3) {
+      height: 26px;
+      animation-delay: 0.7s;
+    }
+
+    @keyframes steamRise {
+      0% {
+        transform: translateY(10px) scaleX(0.3);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(-18px) scaleX(1);
+        opacity: 0;
+      }
+    }
+
+    .bean-orbit {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .bean {
+      position: absolute;
+      width: 20px;
+      height: 28px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #f7d6a8 0, #6b2f0d 55%, #2b1004 100%);
+      box-shadow: 0 10px 16px rgba(0, 0, 0, 0.7);
+      transform-origin: center;
+      animation: orbitBean 6s linear infinite;
+    }
+
+    .bean::after {
+      content: "";
+      position: absolute;
+      inset: 6px 7px;
+      border-radius: 999px;
+      border-left: 1px solid rgba(0, 0, 0, 0.7);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0.7;
+      transform: rotate(-8deg);
+    }
+
+    .bean:nth-child(1) {
+      top: 18%;
+      left: 14%;
+      animation-delay: -1.2s;
+      transform-origin: 130px 72px;
+      transform: rotate(0deg);
+    }
+
+    .bean:nth-child(2) {
+      top: 64%;
+      left: 82%;
+      animation-delay: -3s;
+      transform-origin: -70px -22px;
+    }
+
+    .bean:nth-child(3) {
+      top: 78%;
+      left: 12%;
+      animation-delay: -4.3s;
+      transform-origin: 100px -42px;
+    }
+
+    @keyframes orbitBean {
+      0% {
+        transform: rotate(0deg) translateZ(0);
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: rotate(360deg) translateZ(0);
+        opacity: 0.7;
+      }
+    }
+
+    .hero-tag {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 10px;
+      backdrop-filter: blur(14px);
+      font-size: 0.8rem;
+      color: var(--muted);
+      gap: 10px;
+    }
+
+    .hero-tag strong {
+      color: #ffd6a0;
+      font-weight: 500;
+    }
+
+    .hero-tag-pill {
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: rgba(229, 168, 107, 0.14);
+      color: #ffd6a0;
+      border: 1px solid rgba(229, 168, 107, 0.4);
+    }
+
+    /* Coffee carousel */
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .section-heading h2 {
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #f4e7cc;
+    }
+
+    .section-heading span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .carousel-shell {
+      position: relative;
+      background: radial-gradient(circle at 0 0, rgba(229, 168, 107, 0.18), transparent 55%),
+        linear-gradient(to bottom, rgba(13, 14, 24, 0.95), rgba(6, 7, 15, 1));
+      border-radius: 24px;
+      padding: 16px 16px 14px;
+      margin-bottom: 26px;
+      box-shadow:
+        0 20px 44px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.03);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+    }
+
+    .carousel-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 110% -20%, rgba(255, 200, 140, 0.25), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .filter-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(12, 13, 26, 0.8);
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #5c607f;
+    }
+
+    .chip.active {
+      background: rgba(229, 168, 107, 0.15);
+      border-color: rgba(229, 168, 107, 0.8);
+      color: #ffe7c5;
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.7);
+    }
+
+    .chip.active .chip-dot {
+      background: radial-gradient(circle, #ffd095, #f28b39);
+    }
+
+    .carousel-nav {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(0, 0, 0, 0.6);
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .nav-btn:hover {
+      border-color: rgba(229, 168, 107, 0.8);
+      color: #ffe4c2;
+      background: rgba(13, 6, 2, 0.95);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .carousel-strip {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 6px;
+      padding-top: 6px;
+      scrollbar-width: none;
+    }
+
+    .carousel-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .coffee-card {
+      scroll-snap-align: start;
+      min-width: min(220px, 70vw);
+      background: linear-gradient(145deg, rgba(20, 21, 36, 0.98), rgba(12, 8, 6, 0.98));
+      border-radius: 18px;
+      padding: 12px 12px 11px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow:
+        0 16px 32px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(0, 0, 0, 0.7) inset;
+      position: relative;
+      overflow: hidden;
+      transform-origin: center bottom;
+      transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-med), background var(--transition-med), opacity 160ms ease-out;
+    }
+
+    .coffee-card::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: radial-gradient(circle at 10% 0, rgba(255, 224, 173, 0.16), transparent 52%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .coffee-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow:
+        0 28px 40px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(229, 168, 107, 0.4);
+      border-color: rgba(229, 168, 107, 0.7);
+      background: linear-gradient(145deg, rgba(38, 25, 18, 0.98), rgba(10, 12, 25, 0.98));
+    }
+
+    .coffee-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+      gap: 4px;
+    }
+
+    .coffee-name {
+      font-size: 0.98rem;
+      font-weight: 500;
+    }
+
+    .coffee-tag {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(229, 168, 107, 0.18);
+      border: 1px solid rgba(229, 168, 107, 0.6);
+      color: #ffd8a7;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .coffee-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .coffee-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      gap: 6px;
+    }
+
+    .coffee-strength {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .dots {
+      display: inline-flex;
+      gap: 3px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #3a3d54;
+      opacity: 0.8;
+    }
+
+    .dot.on {
+      background: radial-gradient(circle, #f3cb88, #e98b3d);
+      box-shadow: 0 0 6px rgba(233, 139, 61, 0.6);
+    }
+
+    .coffee-price {
+      font-weight: 500;
+      color: #ffe0b7;
+    }
+
+    .coffee-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .coffee-volume {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    .btn-mini {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 9px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      background: rgba(229, 168, 107, 0.15);
+      color: #ffe2bf;
+      border: 1px solid rgba(229, 168, 107, 0.8);
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn-mini span.icon {
+      font-size: 0.78rem;
+      transform: translateY(0.5px);
+    }
+
+    .btn-mini:hover {
+      background: rgba(229, 168, 107, 0.32);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.7);
+    }
+
+    .favorite-toggle {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.6);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.86rem;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .favorite-toggle.active {
+      background: radial-gradient(circle, #ffb4a0, #e96b6b);
+      border-color: rgba(255, 255, 255, 0.85);
+      color: #3b0507;
+      box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.8),
+        0 0 12px rgba(233, 107, 107, 0.8);
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    .favorite-toggle span {
+      transition: transform 160ms ease-out;
+    }
+
+    .favorite-toggle.active span {
+      transform: scale(1.1);
+    }
+
+    /* Info footer */
+    .info-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .info-pill {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(8, 9, 18, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-pill strong {
+      color: #f4e2c0;
+      font-weight: 500;
+    }
+
+    .dot-soft {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #ffc37e, #f0703a);
+      box-shadow: 0 0 6px rgba(240, 112, 58, 0.7);
+    }
+
+    .info-link {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .info-link span.icon {
+      font-size: 0.9rem;
+      transform: translateY(1px);
+    }
+
+    footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.06);
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Fade-in on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 480ms ease-out, transform 480ms ease-out;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="noise-overlay"></div>
+
+  <div class="page">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-text">
+          <h1>Café Aroma</h1>
+          <span>Small batch • slow brewed</span>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-pill" id="themeToggle">
+          <span class="dot"></span>
+          <span>Ambient lights</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="hero-badge">
+          <div class="badge-cup"><span>☕</span></div>
+          <span>Handcrafted coffee, animated on your screen</span>
+        </div>
+        <h2 class="hero-title">
+          Wake up your senses with
+          <span class="accent">cinematic coffee</span>
+        </h2>
+        <p class="hero-subtitle">
+          Explore our signature collection of freshly brewed coffees with smooth interactions,
+          soft glows and floating cups. Built with pure HTML, CSS and JavaScript.
+        </p>
+        <div class="hero-cta-row">
+          <button class="btn-primary" id="scrollToMenu">
+            <span>Browse coffee menu</span>
+            <span class="icon">➜</span>
+          </button>
+          <button class="btn-ghost">
+            <span>Today’s roast: Ethiopian Yirgacheffe</span>
+          </button>
+        </div>
+        <div class="hero-meta">
+          <span><strong>20+</strong> artisan recipes</span>
+          <span>Animated with CSS & JS only</span>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal">
+        <div class="hero-orbit">
+          <div class="hero-cup">
+            <div class="cup-body">
+              <div class="steam">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="cup-handle"></div>
+              <div class="cup-plate"></div>
+            </div>
+            <div class="bean-orbit">
+              <div class="bean"></div>
+              <div class="bean"></div>
+              <div class="bean"></div>
+            </div>
+          </div>
+          <div class="hero-tag">
+            <span><strong>Freshly brewed</strong> every morning, 6am – 10pm</span>
+            <span class="hero-tag-pill">Since 2014</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coffee section -->
+    <section id="menuSection">
+      <div class="section-heading">
+        <div>
+          <h2>Signature Coffee Bar</h2>
+          <span>Swipe cards, favorite drinks and filter by roast.</span>
+        </div>
+        <span>Scroll horizontally →</span>
+      </div>
+
+      <div class="carousel-shell reveal">
+        <div class="filter-row">
+          <div class="filter-chips" id="filterChips">
+            <button class="chip active" data-filter="all">
+              <span class="chip-dot"></span>
+              <span>All</span>
+            </button>
+            <button class="chip" data-filter="espresso">
+              <span class="chip-dot"></span>
+              <span>Espresso</span>
+            </button>
+            <button class="chip" data-filter="milk">
+              <span class="chip-dot"></span>
+              <span>Milky</span>
+            </button>
+            <button class="chip" data-filter="iced">
+              <span class="chip-dot"></span>
+              <span>Iced</span>
+            </button>
+            <button class="chip" data-filter="special">
+              <span class="chip-dot"></span>
+              <span>Special</span>
+            </button>
+          </div>
+          <div class="carousel-nav">
+            <button class="nav-btn" id="prevBtn">‹</button>
+            <button class="nav-btn" id="nextBtn">›</button>
+          </div>
+        </div>
+
+        <div class="carousel-strip" id="coffeeStrip">
+          <!-- Cards will be inserted by JS -->
+        </div>
+
+        <div class="info-row">
+          <div class="info-pill">
+            <span class="dot-soft"></span>
+            <span><strong>Tip</strong> drag or use arrows to move the menu.</span>
+          </div>
+          <div class="info-pill">
+            <span class="dot-soft"></span>
+            <span><strong>Live</strong> favorite animations on heart tap.</span>
+          </div>
+          <div class="info-link">
+            <span>Built with HTML, CSS & JavaScript</span>
+            <span class="icon">☆</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>© 2026 Café Aroma — Crafted with care.</span>
+      <span>HTML • CSS • JavaScript only.</span>
+    </footer>
+  </div>
+
+  <script>
+    // Coffee data
+    const coffees = [
+      {
+        name: "Velvet Espresso",
+        tag: "Espresso",
+        type: "espresso",
+        description: "Dense, syrupy shot with bittersweet cocoa and caramel notes.",
+        strength: 5,
+        price: "₹180",
+        volume: "30 ml",
+        special: false
+      },
+      {
+        name: "Classic Cappuccino",
+        tag: "Milky",
+        type: "milk",
+        description: "Rich espresso, silky milk foam and a dusting of chocolate.",
+        strength: 3,
+        price: "₹220",
+        volume: "180 ml",
+        special: false
+      },
+      {
+        name: "Caramel Latte Glow",
+        tag: "Special",
+        type: "milk special",
+        description: "Slow-poured caramel, micro-foam milk and double shot espresso.",
+        strength: 3,
+        price: "₹260",
+        volume: "250 ml",
+        special: true
+      },
+      {
+        name: "Iced Mocha Drift",
+        tag: "Iced",
+        type: "iced",
+        description: "Cold brew and dark chocolate over ice with velvet cream.",
+        strength: 2,
+        price: "₹240",
+        volume: "300 ml",
+        special: false
+      },
+      {
+        name: "Hazelnut Flat White",
+        tag: "Milky",
+        type: "milk",
+        description: "Smooth, nutty balance of espresso and steamed milk.",
+        strength: 4,
+        price: "₹250",
+        volume: "180 ml",
+        special: false
+      },
+      {
+        name: "Cold Brew Cascade",
+        tag: "Iced",
+        type: "iced special",
+        description: "16-hour steeped cold brew served over artisan ice.",
+        strength: 4,
+        price: "₹230",
+        volume: "280 ml",
+        special: true
+      }
+    ];
+
+    const strip = document.getElementById("coffeeStrip");
+
+    function createDotRow(level) {
+      const dots = [];
+      for (let i = 1; i <= 5; i++) {
+        const cls = i <= level ? "dot on" : "dot";
+        dots.push(`<span class="${cls}"></span>`);
+      }
+      return dots.join("");
+    }
+
+    function createCard(coffee) {
+      const card = document.createElement("article");
+      card.className = "coffee-card";
+      card.dataset.type = coffee.type;
+
+      card.innerHTML = `
+        <div class="coffee-top-row">
+          <div>
+            <div class="coffee-name">${coffee.name}</div>
+          </div>
+          <span class="coffee-tag">${coffee.tag}</span>
+        </div>
+        <p class="coffee-desc">${coffee.description}</p>
+        <div class="coffee-meta-row">
+          <div class="coffee-strength">
+            <span>Strength</span>
+            <div class="dots">
+              ${createDotRow(coffee.strength)}
+            </div>
+          </div>
+          <div class="coffee-price">${coffee.price}</div>
+        </div>
+        <div class="coffee-actions">
+          <div class="coffee-volume">${coffee.volume}</div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn-mini">
+              <span class="icon">＋</span>
+              <span>Order</span>
+            </button>
+            <button class="favorite-toggle" aria-label="Toggle favorite">
+              <span>♡</span>
+            </button>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    coffees.forEach(c => strip.appendChild(createCard(c)));
+
+    // Filter logic
+    const chips = Array.from(document.querySelectorAll(".chip"));
+
+    function applyFilter(filter) {
+      const cards = Array.from(document.querySelectorAll(".coffee-card"));
+      cards.forEach(card => {
+        const type = card.dataset.type;
+        const matches = filter === "all" || type.includes(filter);
+        card.style.pointerEvents = matches ? "auto" : "none";
+        card.style.opacity = matches ? "1" : "0.15";
+        card.style.transform = matches ? "" : "scale(0.96)";
+      });
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        chips.forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        const filter = chip.dataset.filter;
+        applyFilter(filter);
+      });
+    });
+
+    // Favorite interactions
+    strip.addEventListener("click", (e) => {
+      const btn = e.target.closest(".favorite-toggle");
+      if (!btn) return;
+      btn.classList.toggle("active");
+      btn.innerHTML = `<span>${btn.classList.contains("active") ? "♥" : "♡"}</span>`;
+    });
+
+    // Carousel nav
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function scrollByCard(direction) {
+      const firstCard = strip.querySelector(".coffee-card");
+      if (!firstCard) return;
+      const cardWidth = firstCard.getBoundingClientRect().width + 14;
+      strip.scrollBy({ left: direction * cardWidth, behavior: "smooth" });
+    }
+
+    prevBtn.addEventListener("click", () => scrollByCard(-1));
+    nextBtn.addEventListener("click", () => scrollByCard(1));
+
+    // Smooth scroll to menu
+    document.getElementById("scrollToMenu").addEventListener("click", () => {
+      document.getElementById("menuSection").scrollIntoView({ behavior: "smooth" });
+    });
+
+    // Ambient "light" toggle (subtle color shift)
+    const themeToggle = document.getElementById("themeToggle");
+    let warm = true;
+    themeToggle.addEventListener("click", () => {
+      warm = !warm;
+      document.body.style.transition = "background 400ms ease-out";
+      document.body.style.background = warm
+        ? "radial-gradient(circle at top, #23263b 0, #090a10 48%, #05050a 100%)"
+        : "radial-gradient(circle at bottom, #161627 0, #060615 50%, #020205 100%)";
+    });
+
+    // Scroll reveal
+    const revealEls = Array.from(document.querySelectorAll(".reveal"));
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    revealEls.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
